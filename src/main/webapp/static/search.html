@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.1.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.4.2.js"></script>
+</head>
+<body>
+<div class="navbar">
+    <div class="navbar-inner">
+        <a class="brand" href="#">ToDo API Client Demo</a>
+    </div>
+</div>
+<div id="main" class="container">
+    <table class="table table-striped">
+        <tr>
+            <td style="width: 1px;"></td>
+            <td><b>Type</b></td>
+            <td><b>Topic</b></td>
+            <td><b>Url</b></td>
+            <td><b>Count</b></td>
+        </tr>
+        <!-- ko foreach: tasks -->
+        <tr>
+            <td style="width: 1px;"></td>
+            <td>
+                <p><b data-bind="text: type"></b></p>
+            </td>
+            <td>
+                <p><b data-bind="text: topic"></b></p>
+            </td>
+            <td>
+                <p><b data-bind="text: url"></b></p>
+            </td>
+            <td>
+                <p><b data-bind="text: count"></b></p>
+            </td>
+        </tr>
+        <!-- /ko -->
+    </table>
+</div>
+
+<script type="text/javascript">
+    function TasksViewModel() {
+        var self = this;
+        self.tasksURI = 'http://localhost:4001/search';
+        self.username = "test";
+        self.password = "pwd";
+        self.tasks = ko.observableArray();
+        self.ajax = function (uri, method, data) {
+            var request = {
+                url: uri,
+                type: method,
+                contentType: "application/json",
+                accept: "application/json",
+                cache: false,
+                dataType: 'json',
+                data: JSON.stringify(data),
+                error: function (jqXHR) {
+                    console.log("ajax error " + jqXHR.status);
+                }
+            };
+            return $.ajax(request);
+        }
+        self.updateTask = function (task, newTask) {
+            var i = self.tasks.indexOf(task);
+            self.tasks()[i].type(newTask.type);
+            self.tasks()[i].topic(newTask.topic);
+            self.tasks()[i].url(newTask.url);
+            self.tasks()[i].count(newTask.count);
+        }
+        self.ajax(self.tasksURI, 'GET').done(function(data) {
+            for (var i = 0; i < data.length; i++) {
+                self.tasks.push({
+                    type: ko.observable(data[i].type),
+                    topic: ko.observable(data[i].topic),
+                    url: ko.observable(data[i].url),
+                    count: ko.observable(data[i].count)
+                });
+            }
+        });
+    }
+    var tasksViewModel = new TasksViewModel();
+    ko.applyBindings(tasksViewModel, $('#main')[0]);
+</script>
+
+</body>
+</html>
