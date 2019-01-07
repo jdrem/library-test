@@ -14,9 +14,10 @@ public class LibraryController {
 
     private final static Logger log = LoggerFactory.getLogger(LibraryController.class);
 
-    @RequestMapping(value = "/search", method = RequestMethod.GET)
+    @RequestMapping(value = "/search", params = {"topic"}, method = RequestMethod.GET)
     @ResponseBody
-    public List<Map<String, Object>> search() {
+    public List<Map<String, Object>> search(@RequestParam(value = "topic") String searchTopic) {
+        log.info("got search request: {}",searchTopic);
         ImmutableMap.Builder<String,Object> builder = ImmutableMap.builder();
         ImmutableList.Builder<Map<String,Object>> listBuilder = ImmutableList.builder();
         listBuilder.add(ImmutableMap.of("type","subject","topic","England -- History","url","subject/1","count",2));
