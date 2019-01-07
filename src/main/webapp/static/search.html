@@ -4,17 +4,36 @@
     <meta charset="UTF-8">
     <title>Search</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <script src="http://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.1.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+            crossorigin="anonymous"></script>
     <script src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.4.2.js"></script>
 </head>
-<body>
+<body class="text-center">
 <div class="navbar">
     <div class="navbar-inner">
         <a class="brand" href="#">ToDo API Client Demo</a>
     </div>
 </div>
+
+<div id="search">
+    <div class="align-items-center">
+        <form>
+            <label for="searchTerm" class="col-sm-2 col-form-label">Search</label>
+            <div class="col-sm-10">
+                <input type="email" class="form-control" id="searchTerm">
+            </div>
+            <div>
+                <button data-bind="click: performSearch" class="btn search-btn">Search</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
 <div id="main" class="container">
     <table class="table table-striped">
         <tr>
@@ -47,7 +66,7 @@
 <script type="text/javascript">
     function TasksViewModel() {
         var self = this;
-        self.tasksURI = 'http://localhost:4001/search';
+        self.tasksURI = 'http://localhost:4001/search?topic=England';
         self.username = "test";
         self.password = "pwd";
         self.tasks = ko.observableArray();
@@ -73,7 +92,7 @@
             self.tasks()[i].url(newTask.url);
             self.tasks()[i].count(newTask.count);
         }
-        self.ajax(self.tasksURI, 'GET').done(function(data) {
+        self.ajax(self.tasksURI, 'GET').done(function (data) {
             for (var i = 0; i < data.length; i++) {
                 self.tasks.push({
                     type: ko.observable(data[i].type),
@@ -84,6 +103,7 @@
             }
         });
     }
+
     var tasksViewModel = new TasksViewModel();
     ko.applyBindings(tasksViewModel, $('#main')[0]);
 </script>
