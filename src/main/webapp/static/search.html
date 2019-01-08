@@ -19,22 +19,13 @@
     </div>
 </div>
 
-<div id="search">
+<div id="search" class="container">
     <div class="align-items-center">
 
         <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
-            <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
+            <input data-bind="textInput: searchTerm" class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
+            <button data-bind="click: performSearch" class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
         </form>
-       <!-- <form>
-            <label for="searchTerm" class="col-sm-4 col-form-label">Search</label>
-            <div class="col-sm-4">
-                <input type="email" class="form-control" id="searchTerm">
-            </div>
-            <div>
-                <button data-bind="click: performSearch" class="btn search-btn">Search</button>
-            </div>
-        </form>-->
     </div>
 </div>
 
@@ -71,7 +62,8 @@
 <script type="text/javascript">
     function TasksViewModel() {
         var self = this;
-        self.tasksURI = 'http://localhost:4001/search?topic=England';
+        // self.tasksURI = 'http://localhost:4001/search?topic=England';
+        self.tasksURI = 'http://localhost:4001/search?topic=';
         self.username = "test";
         self.password = "pwd";
         self.tasks = ko.observableArray();
@@ -97,20 +89,35 @@
             self.tasks()[i].url(newTask.url);
             self.tasks()[i].count(newTask.count);
         }
-        self.ajax(self.tasksURI, 'GET').done(function (data) {
-            for (var i = 0; i < data.length; i++) {
-                self.tasks.push({
-                    type: ko.observable(data[i].type),
-                    topic: ko.observable(data[i].topic),
-                    url: ko.observable(data[i].url),
-                    count: ko.observable(data[i].count)
-                });
-            }
-        });
+        self.performSearch = function(term) {
+            var x = term;
+            self.ajax(self.tasksURI + x + y, 'GET').done(function (data) {
+                for (var i = 0; i < data.length; i++) {
+                    self.tasks.push({
+                        type: ko.observable(data[i].type),
+                        topic: ko.observable(data[i].topic),
+                        url: ko.observable(data[i].url),
+                        count: ko.observable(data[i].count)
+                    });
+                }
+            });
+        }
     }
 
+    function PerformSearchViewModel() {
+        var self = this;
+        self.title = ko.observable();
+        self.description = ko.observable();
+        self.searchTerm = ko.observable();
+
+        self.performSearch = function() {
+            tasksViewModel.performSearch(self.searchTerm);
+        }
+    }
     var tasksViewModel = new TasksViewModel();
+    var performSearchViewModel = new PerformSearchViewModel();
     ko.applyBindings(tasksViewModel, $('#main')[0]);
+    ko.applyBindings(performSearchViewModel, $('#search')[0]);
 </script>
 
 </body>
