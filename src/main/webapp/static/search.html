@@ -29,6 +29,9 @@
     </div>
 </div>
 
+<div>
+    <p>&nbsp;</p>
+</div>
 
 <div id="main" class="container">
     <table class="table table-striped">
@@ -62,8 +65,7 @@
 <script type="text/javascript">
     function TasksViewModel() {
         var self = this;
-        // self.tasksURI = 'http://localhost:4001/search?topic=England';
-        self.tasksURI = 'http://localhost:4001/search?topic=';
+        self.tasksURI = 'http://localhost:4001';
         self.username = "test";
         self.password = "pwd";
         self.tasks = ko.observableArray();
@@ -90,8 +92,7 @@
             self.tasks()[i].count(newTask.count);
         }
         self.performSearch = function(term) {
-            var x = term;
-            self.ajax(self.tasksURI + x + y, 'GET').done(function (data) {
+            self.ajax(self.tasksURI + '/search?topic=' + term, 'GET').done(function (data) {
                 for (var i = 0; i < data.length; i++) {
                     self.tasks.push({
                         type: ko.observable(data[i].type),
@@ -111,7 +112,7 @@
         self.searchTerm = ko.observable();
 
         self.performSearch = function() {
-            tasksViewModel.performSearch(self.searchTerm);
+            tasksViewModel.performSearch(self.searchTerm());
         }
     }
     var tasksViewModel = new TasksViewModel();
