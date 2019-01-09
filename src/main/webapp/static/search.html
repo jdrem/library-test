@@ -118,6 +118,7 @@
         }
         self.performSearch = function(term) {
             self.ajax(self.tasksURI + '/search?topic=' + term, 'GET').done(function (data) {
+                self.tasks.removeAll();
                 for (var i = 0; i < data.length; i++) {
                     self.tasks.push({
                         type: ko.observable(data[i].type),
@@ -130,8 +131,8 @@
         }
         self.selectThing = function(item) {
             topicSummaryViewModel.fetchSummary(item.url());
-            $("#main").toggleClass('hidden');
-            $("#summary").toggleClass('hidden');
+            $("#main").addClass('hidden');
+            $("#summary").removeClass('hidden');
         };
     }
 
@@ -143,7 +144,8 @@
 
         self.performSearch = function() {
             tasksViewModel.performSearch(self.searchTerm());
-            $("#main").toggleClass('hidden');
+            $("#main").removeClass('hidden');
+            $("#summary").addClass('hidden');
         }
     }
 
@@ -177,6 +179,7 @@
         }
         self.fetchSummary = function(term) {
             self.ajax(self.tasksURI + '/' + term, 'GET').done(function (data) {
+                self.tasks.removeAll();
                 for (var i = 0; i < data.length; i++) {
                     self.tasks.push({
                         title: ko.observable(data[i].title),
