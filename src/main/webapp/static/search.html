@@ -43,7 +43,7 @@
             <td><b>Count</b></td>
         </tr>
         <!-- ko foreach: tasks -->
-        <tr>
+        <tr data-bind="click: $root.selectThing ">
             <td style="width: 1px;"></td>
             <td>
                 <p><b data-bind="text: type"></b></p>
@@ -103,6 +103,9 @@
                 }
             });
         }
+        self.selectThing = function(item) {
+            self.model.CurrentDisplayThing(item);
+        };
     }
 
     function PerformSearchViewModel() {
@@ -116,6 +119,9 @@
             $("#main").toggleClass('hidden');
         }
     }
+
+
+
     var tasksViewModel = new TasksViewModel();
     var performSearchViewModel = new PerformSearchViewModel();
     ko.applyBindings(tasksViewModel, $('#main')[0]);
