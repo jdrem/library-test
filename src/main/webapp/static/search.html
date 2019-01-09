@@ -39,7 +39,7 @@
             <td style="width: 1px;"></td>
             <td><b>Type</b></td>
             <td><b>Topic</b></td>
-            <td><b>Url</b></td>
+            <td style="display: none;"><b>Url</b></td>
             <td><b>Count</b></td>
         </tr>
         <!-- ko foreach: tasks -->
@@ -51,11 +51,36 @@
             <td>
                 <p><b data-bind="text: topic"></b></p>
             </td>
-            <td>
+            <td style="display: none;">
                 <p><b data-bind="text: url"></b></p>
             </td>
             <td>
                 <p><b data-bind="text: count"></b></p>
+            </td>
+        </tr>
+        <!-- /ko -->
+    </table>
+</div>
+
+<div id="summary" class="container hidden">
+    <table class="table table-striped">
+        <tr>
+            <td style="width: 1px;"></td>
+            <td><b>Title</b></td>
+            <td><b>Author</b></td>
+            <td style="display: none;"><b>Url</b></td>
+        </tr>
+        <!-- ko foreach: tasks -->
+        <tr data-bind="click: $root.selectThing ">
+            <td style="width: 1px;"></td>
+            <td>
+                <p><b data-bind="text: title"></b></p>
+            </td>
+            <td>
+                <p><b data-bind="text: author"></b></p>
+            </td>
+            <td style="display: none;">
+                <p><b data-bind="text: url"></b></p>
             </td>
         </tr>
         <!-- /ko -->
@@ -93,6 +118,7 @@
         }
         self.performSearch = function(term) {
             self.ajax(self.tasksURI + '/search?topic=' + term, 'GET').done(function (data) {
+                self.tasks.removeAll();
                 for (var i = 0; i < data.length; i++) {
                     self.tasks.push({
                         type: ko.observable(data[i].type),
@@ -104,7 +130,9 @@
             });
         }
         self.selectThing = function(item) {
-            self.model.CurrentDisplayThing(item);
+            topicSummaryViewModel.fetchSummary(item.url());
+            $("#main").addClass('hidden');
+            $("#summary").removeClass('hidden');
         };
     }
 
@@ -116,16 +144,59 @@
 
         self.performSearch = function() {
             tasksViewModel.performSearch(self.searchTerm());
-            $("#main").toggleClass('hidden');
+            $("#main").removeClass('hidden');
+            $("#summary").addClass('hidden');
         }
     }
 
 
+    function TopicSummaryViewModel() {
+        var self = this;
+        self.tasksURI = 'http://localhost:4001';
+        self.username = "test";
+        self.password = "pwd";
+        self.tasks = ko.observableArray();
+        self.ajax = function (uri, method, data) {
+            var request = {
+                url: uri,
+                type: method,
+                contentType: "application/json",
+                accept: "application/json",
+                cache: false,
+                dataType: 'json',
+                data: JSON.stringify(data),
+                error: function (jqXHR) {
+                    console.log("ajax error " + jqXHR.status);
+                }
+            };
+            return $.ajax(request);
+        }
+        self.updateTask = function (task, newTask) {
+            var i = self.tasks.indexOf(task);
+            self.tasks()[i].title(newTask.title);
+            self.tasks()[i].author(newTask.author);
+            self.tasks()[i].url(newTask.url);
+        }
+        self.fetchSummary = function(term) {
+            self.ajax(self.tasksURI + '/' + term, 'GET').done(function (data) {
+                self.tasks.removeAll();
+                for (var i = 0; i < data.length; i++) {
+                    self.tasks.push({
+                        title: ko.observable(data[i].title),
+                        author: ko.observable(data[i].author),
+                        url: ko.observable(data[i].url)
+                    });
+                }
+            });
+        }
+    }
 
     var tasksViewModel = new TasksViewModel();
     var performSearchViewModel = new PerformSearchViewModel();
+    var topicSummaryViewModel = new TopicSummaryViewModel();
     ko.applyBindings(tasksViewModel, $('#main')[0]);
     ko.applyBindings(performSearchViewModel, $('#search')[0]);
+    ko.applyBindings(topicSummaryViewModel, $('#summary')[0]);
 </script>
 
 </body>
