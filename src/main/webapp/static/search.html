@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!--suppress JSUnresolvedFunction -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -23,8 +24,10 @@
     <div class="align-items-center">
 
         <form class="form-inline my-2 my-lg-0">
-            <input data-bind="textInput: searchTerm" class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
-            <button data-bind="click: performSearch" class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
+            <input data-bind="textInput: searchTerm" class="form-control mr-sm-2" type="text" placeholder="Search"
+                   aria-label="Search">
+            <button data-bind="click: performSearch" class="btn btn-secondary my-2 my-sm-0" type="submit">Search
+            </button>
         </form>
     </div>
 </div>
@@ -42,7 +45,8 @@
             <td style="display: none;"><b>Url</b></td>
             <td><b>Count</b></td>
         </tr>
-        <!-- ko foreach: tasks -->
+
+        <tbody data-bind="foreach: tasks">
         <tr data-bind="click: $root.selectThing ">
             <td style="width: 1px;"></td>
             <td>
@@ -58,7 +62,8 @@
                 <p><b data-bind="text: count"></b></p>
             </td>
         </tr>
-        <!-- /ko -->
+        </tbody>
+
     </table>
 </div>
 
@@ -70,7 +75,7 @@
             <td><b>Author</b></td>
             <td style="display: none;"><b>Url</b></td>
         </tr>
-        <!-- ko foreach: tasks -->
+        <tbody data-bind="foreach: tasks">
         <tr data-bind="click: $root.selectThing ">
             <td style="width: 1px;"></td>
             <td>
@@ -83,19 +88,20 @@
                 <p><b data-bind="text: url"></b></p>
             </td>
         </tr>
-        <!-- /ko -->
+        </tbody>
     </table>
 </div>
 
 <script type="text/javascript">
+    // noinspection JSUnresolvedFunction
     function TasksViewModel() {
-        var self = this;
+        let self = this;
         self.tasksURI = 'http://localhost:4001';
         self.username = "test";
         self.password = "pwd";
         self.tasks = ko.observableArray();
         self.ajax = function (uri, method, data) {
-            var request = {
+            let request = {
                 url: uri,
                 type: method,
                 contentType: "application/json",
@@ -108,18 +114,18 @@
                 }
             };
             return $.ajax(request);
-        }
+        };
         self.updateTask = function (task, newTask) {
-            var i = self.tasks.indexOf(task);
+            let i = self.tasks.indexOf(task);
             self.tasks()[i].type(newTask.type);
             self.tasks()[i].topic(newTask.topic);
             self.tasks()[i].url(newTask.url);
             self.tasks()[i].count(newTask.count);
-        }
-        self.performSearch = function(term) {
+        };
+        self.performSearch = function (term) {
             self.ajax(self.tasksURI + '/search?topic=' + term, 'GET').done(function (data) {
                 self.tasks.removeAll();
-                for (var i = 0; i < data.length; i++) {
+                for (let i = 0; i < data.length; i++) {
                     self.tasks.push({
                         type: ko.observable(data[i].type),
                         topic: ko.observable(data[i].topic),
@@ -128,21 +134,20 @@
                     });
                 }
             });
-        }
-        self.selectThing = function(item) {
+        };
+        self.selectThing = function (item) {
             topicSummaryViewModel.fetchSummary(item.url());
             $("#main").addClass('hidden');
             $("#summary").removeClass('hidden');
         };
     }
-
     function PerformSearchViewModel() {
-        var self = this;
+        let self = this;
         self.title = ko.observable();
         self.description = ko.observable();
         self.searchTerm = ko.observable();
 
-        self.performSearch = function() {
+        self.performSearch = function () {
             tasksViewModel.performSearch(self.searchTerm());
             $("#main").removeClass('hidden');
             $("#summary").addClass('hidden');
@@ -151,13 +156,13 @@
 
 
     function TopicSummaryViewModel() {
-        var self = this;
+        let self = this;
         self.tasksURI = 'http://localhost:4001';
         self.username = "test";
         self.password = "pwd";
         self.tasks = ko.observableArray();
         self.ajax = function (uri, method, data) {
-            var request = {
+            let request = {
                 url: uri,
                 type: method,
                 contentType: "application/json",
@@ -170,17 +175,17 @@
                 }
             };
             return $.ajax(request);
-        }
+        };
         self.updateTask = function (task, newTask) {
-            var i = self.tasks.indexOf(task);
+            let i = self.tasks.indexOf(task);
             self.tasks()[i].title(newTask.title);
             self.tasks()[i].author(newTask.author);
             self.tasks()[i].url(newTask.url);
-        }
-        self.fetchSummary = function(term) {
+        };
+        self.fetchSummary = function (term) {
             self.ajax(self.tasksURI + '/' + term, 'GET').done(function (data) {
                 self.tasks.removeAll();
-                for (var i = 0; i < data.length; i++) {
+                for (let i = 0; i < data.length; i++) {
                     self.tasks.push({
                         title: ko.observable(data[i].title),
                         author: ko.observable(data[i].author),
@@ -191,9 +196,9 @@
         }
     }
 
-    var tasksViewModel = new TasksViewModel();
-    var performSearchViewModel = new PerformSearchViewModel();
-    var topicSummaryViewModel = new TopicSummaryViewModel();
+    let tasksViewModel = new TasksViewModel();
+    let performSearchViewModel = new PerformSearchViewModel();
+    let topicSummaryViewModel = new TopicSummaryViewModel();
     ko.applyBindings(tasksViewModel, $('#main')[0]);
     ko.applyBindings(performSearchViewModel, $('#search')[0]);
     ko.applyBindings(topicSummaryViewModel, $('#summary')[0]);
