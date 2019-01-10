@@ -47,7 +47,7 @@
         </tr>
 
         <tbody data-bind="foreach: tasks">
-        <tr data-bind="click: $root.selectThing ">
+        <tr data-bind="click: $root.selectRow ">
             <td style="width: 1px;"></td>
             <td>
                 <p><b data-bind="text: type"></b></p>
@@ -76,7 +76,7 @@
             <td style="display: none;"><b>Url</b></td>
         </tr>
         <tbody data-bind="foreach: tasks">
-        <tr data-bind="click: $root.selectThing ">
+        <tr data-bind="click: $root.selectRow ">
             <td style="width: 1px;"></td>
             <td>
                 <p><b data-bind="text: title"></b></p>
@@ -135,7 +135,7 @@
                 }
             });
         };
-        self.selectThing = function (item) {
+        self.selectRow = function (item) {
             topicSummaryViewModel.fetchSummary(item.url());
             $("#main").addClass('hidden');
             $("#summary").removeClass('hidden');
