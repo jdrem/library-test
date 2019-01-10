@@ -15,9 +15,18 @@
 </head>
 <body class="text-center">
 <div class="navbar">
-    <div class="navbar-inner">
-        <a class="brand" href="#">ToDo API Client Demo</a>
-    </div>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <a class="navbar-brand" href="#">Library</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <a class="nav-item nav-link active" href="#">Home <span class="sr-only">(current)</span></a>
+                <a class="nav-item nav-link" href="#">Search</a>
+            </div>
+        </div>
+    </nav>
 </div>
 
 <div id="search" class="container">
@@ -90,6 +99,11 @@
         </tr>
         </tbody>
     </table>
+    <form class="form-inline my-2 my-lg-0">
+        <button data-bind="click: goBackToSearch" class="btn btn-secondary my-2 my-sm-0" type="button">
+            Go Back to Search Results
+        </button>
+    </form>
 </div>
 
 <script type="text/javascript">
@@ -193,6 +207,11 @@
                     });
                 }
             });
+        }
+
+        self.goBackToSearch = function () {
+            $("#main").removeClass('hidden');
+            $("#summary").addClass('hidden');
         }
     }
 
