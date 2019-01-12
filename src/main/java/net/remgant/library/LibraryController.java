@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@RequestMapping("/api")
 public class LibraryController {
 
     private final static Logger log = LoggerFactory.getLogger(LibraryController.class);
@@ -45,4 +46,16 @@ public class LibraryController {
         listBuilder.add(ImmutableMap.of("title","Persuasion", "author","Austen, Jane","url","book/44"));
         return listBuilder.build();
     }
+
+    @RequestMapping(value="/book/{bookId}", method = RequestMethod.GET)
+        @ResponseBody Map<String,Object> book(@PathVariable("bookId") int bookId) {
+            log.info("got book id request: {}",bookId);
+            ImmutableMap.Builder<String, Object> builder = ImmutableMap.builder();
+            builder.put("title","Wind in the Willows, The");
+            builder.put("creator","Graham, Kenneth");
+            builder.put("subject","England -- Fiction");
+            builder.put("lcc","PZ10.3.G76 Wi2");
+            builder.put("ddc","Fiction - Grahame");
+            return builder.build();
+        }
 }
