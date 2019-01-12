@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Search</title>
+    <title>Remgant Library</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
           integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
@@ -25,13 +25,13 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">Remgant Library</a>
+            <a class="navbar-brand" href="#brand">Remgant Library</a>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
-                <li class="active"><a href="search.html">Search the Catalog <span class="sr-only">(current)</span></a></li>
+                <li class="search"><a href="#search">Search the Catalog <span class="sr-only">(current)</span></a></li>
                 <li><a href="#">Authors</a></li>
                 <li><a href="#">Ttitles</a></li>
                 <li><a href="#">Subjects</a></li>
@@ -48,7 +48,11 @@
     </div><!-- /.container-fluid -->
 </nav>
 
-<div id="search" class="container">
+<div id="homepage" class="container">
+    <img src="library.jpg">
+</div>
+
+<div id="search" class="container hidden">
     <div class="align-items-center">
 
         <form class="form-inline my-2 my-lg-0">
@@ -64,7 +68,7 @@
     <p>&nbsp;</p>
 </div>
 
-<div id="main" class="container hidden">
+<div id="search-results" class="container hidden">
     <table class="table table-striped">
         <tr>
             <td style="width: 1px;"></td>
@@ -95,7 +99,7 @@
     </table>
 </div>
 
-<div id="summary" class="container hidden">
+<div id="topic-summary" class="container hidden">
     <table class="table table-striped">
         <tr>
             <td style="width: 1px;"></td>
@@ -127,11 +131,31 @@
 
 <script type="text/javascript">
     // noinspection JSUnresolvedFunction
-    function TasksViewModel() {
+    hasResults = false;
+    hasSummary = false;
+    $(document).ready(function () {
+        $("a.navbar-brand").click(function() {
+            $("#homepage").removeClass('hidden');
+            $("#search").addClass('hidden');
+            $("#search-results").addClass('hidden');
+            $("#topic-summary").addClass('hidden');
+        });
+        $("li.search").click(function () {
+            $("#homepage").addClass('hidden');
+            $("#search").removeClass('hidden');
+            if (hasResults && !hasSummary)
+                $("#search-results").removeClass('hidden');
+            if (hasSummary)
+                $("#topic-summary").removeClass('hidden');
+            //$("#search").show();
+        });
+    });
+    function SearchResultsModel() {
         let self = this;
         self.tasksURI = 'http://localhost:4001';
         self.username = "test";
         self.password = "pwd";
+        self.hasResults = false;
         self.tasks = ko.observableArray();
         self.ajax = function (uri, method, data) {
             let request = {
@@ -158,6 +182,8 @@
         self.performSearch = function (term) {
             self.ajax(self.tasksURI + '/search?topic=' + term, 'GET').done(function (data) {
                 self.tasks.removeAll();
+                if (data.length > 0)
+                    hasResults = true;
                 for (let i = 0; i < data.length; i++) {
                     self.tasks.push({
                         type: ko.observable(data[i].type),
@@ -170,8 +196,8 @@
         };
         self.selectRow = function (item) {
             topicSummaryViewModel.fetchSummary(item.url());
-            $("#main").addClass('hidden');
-            $("#summary").removeClass('hidden');
+            $("#search-results").addClass('hidden');
+            $("#topic-summary").removeClass('hidden');
         };
     }
     function PerformSearchViewModel() {
@@ -181,9 +207,9 @@
         self.searchTerm = ko.observable();
 
         self.performSearch = function () {
-            tasksViewModel.performSearch(self.searchTerm());
-            $("#main").removeClass('hidden');
-            $("#summary").addClass('hidden');
+            searchResultsModel.performSearch(self.searchTerm());
+            $("#search-results").removeClass('hidden');
+            $("#topic-summary").addClass('hidden');
         }
     }
 
@@ -218,6 +244,8 @@
         self.fetchSummary = function (term) {
             self.ajax(self.tasksURI + '/' + term, 'GET').done(function (data) {
                 self.tasks.removeAll();
+                if (data.length > 0)
+                    hasSummary = true;
                 for (let i = 0; i < data.length; i++) {
                     self.tasks.push({
                         title: ko.observable(data[i].title),
@@ -229,17 +257,18 @@
         }
 
         self.goBackToSearch = function () {
-            $("#main").removeClass('hidden');
-            $("#summary").addClass('hidden');
+            $("#search-results").removeClass('hidden');
+            $("#topic-summary").addClass('hidden');
+            hasSummary = false;
         }
     }
 
-    let tasksViewModel = new TasksViewModel();
+    let searchResultsModel = new SearchResultsModel();
     let performSearchViewModel = new PerformSearchViewModel();
     let topicSummaryViewModel = new TopicSummaryViewModel();
-    ko.applyBindings(tasksViewModel, $('#main')[0]);
+    ko.applyBindings(searchResultsModel, $('#search-results')[0]);
     ko.applyBindings(performSearchViewModel, $('#search')[0]);
-    ko.applyBindings(topicSummaryViewModel, $('#summary')[0]);
+    ko.applyBindings(topicSummaryViewModel, $('#topic-summary')[0]);
 </script>
 
 </body>
